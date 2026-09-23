@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>My Co-op Applications</h1>
+
+{# Summary counts. Each card is a link that filters the table to that status. #}
+<section class="summary" aria-label="Summary">
+  <a href="{{ url_for('index', sort=sort or None, order=order if sort else None) }}"
+     class="summary-card {% if not status %}active{% endif %}">
+    <strong>{{ total }}</strong>
+    <span>Total</span>
+  </a>
+  {% for s in statuses %}
+  <a href="{{ url_for('index', status=s, sort=sort or None, order=order if sort else None) }}"
+     class="summary-card {% if s == status %}active{% endif %}">
+    <strong>{{ counts[s] }}</strong>
+    <span class="badge status-{{ s }}">{{ s }}</span>
+  </a>
+  {% endfor %}
+</section>
+
+{# method="get" puts the choice in the URL, like /?status=applied #}
+<form method="get" action="{{ url_for('index') }}" class="filter-form">
+  {# role="group" is a Pico feature that joins the dropdown and button into one bar. #}
+  <fieldset role="group">
+    <select name="status" aria-label="Filter by status">
+      <option value="">All statuses</option>
+      {% for s in statuses %}
+      <option value="{{ s }}" {% if s == status %}selected{% endif %}>{{ s }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Filter</button>
+  </fieldset>
+  {# Keep the current sort when filtering. #}
+  {% if sort %}
+  <input type="hidden" name="sort" value="{{ sort }}">
+  <input type="hidden" name="order" value="{{ order }}">
+  {% endif %}
+</form>
+
+{% if applications %}
+{# Phones hide the table headings, so these links let you sort there instead. #}
+<nav class="mobile-sort" aria-label="Sort">
+  <span>Sort by:</span>
+  {% for column, heading in columns.items() %}
+  {% set next_order = "desc" if sort == column and order == "asc" else "asc" %}
+  <a href="{{ url_for('index', status=status or None, sort=column, order=next_order) }}"
+     {% if sort == column %}class="current"{% endif %}>
+    {{ heading }}{% if sort == column %} {{ "▲" if order == "asc" else "▼" }}{% endif %}
+  </a>
+  {% endfor %}
+</nav>
+
+{# overflow-auto (a Pico class) lets a wide table scroll sideways instead of spilling off the page. #}
+<div class="overflow-auto">
+<table class="app-table">
+  <thead>
+    <tr>
+      {% for column, heading in columns.items() %}
+      {# Clicking the current sort column flips the order; others start A-Z. #}
+      {% set next_order = "desc" if sort == column and order == "asc" else "asc" %}
+      <th scope="col">
+        <a href="{{ url_for('index', status=status or None, sort=column, order=next_order) }}">{{ heading }}</a>
+        {% if sort == column %}{{ "▲" if order == "asc" else "▼" }}{% endif %}
+      </th>
+      {% endfor %}
+      <th scope="col">Posting</th>
+      <th scope="col">Notes</th>
+      <th scope="col"><span class="visually-hidden">Actions</span></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for app in applications %}
+    {# Work out the deadline's look once, then use it below. #}
+    {% set d = app["deadline"] %}
+    {% set passed = d and d < today %}
+    {% set due_soon = d and not passed and d <= soon and app["status"] == "interested" %}
+    <tr {% if due_soon %}class="row-due-soon"{% endif %}>
+      {# data-label is shown as the field name when the row becomes a card on phones. #}
+      <td data-label="Company" class="cell-company"><strong>{{ app["company"] }}</strong></td>
+      <td data-label="Role">{{ app["role"] }}</td>
+      <td data-label="Location">{{ app["location"] or "" }}</td>
+      <td data-label="Status"><span class="badge status-{{ app['status'] }}">{{ app["status"] }}</span></td>
+      <td data-label="Applied" class="cell-date">{{ app["date_applied"] or "" }}</td>
+      <td data-label="Deadline" class="cell-date">
+        {%- if passed -%}
+          <span class="deadline-passed">{{ d }} <small>(passed)</small></span>
+        {%- elif due_soon -%}
+          <strong>{{ d }}</strong> <span class="due-tag">{{ "Due today" if d == today else "Due soon" }}</span>
+        {%- elif d -%}
+          {{ d }}
+        {%- endif -%}
+      </td>
+      <td data-label="Posting">
+        {%- if app["posting_url"] -%}
+          <a href="{{ app['posting_url'] }}" target="_blank" rel="noopener">View posting ↗</a>
+        {%- endif -%}
+      </td>
+      <td data-label="Notes" class="cell-notes">{{ app["notes"] or "" }}</td>
+      <td class="actions">
+        <a href="{{ url_for('edit', app_id=app['id']) }}" role="button" class="outline">Edit</a>
+        {# A tiny form, because deleting must be a POST. confirm() shows "Are you sure?". #}
+        <form method="post" action="{{ url_for('delete', app_id=app['id']) }}"
+              onsubmit="return confirm('Delete this application?');">
+          <button type="submit" class="secondary outline">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% elif status %}
+<article>No applications with status "{{ status }}". <a href="{{ url_for('index') }}">Show all</a></article>
+{% else %}
+<article>No applications yet. <a href="{{ url_for('add') }}">Add your first one</a></article>
+{% endif %}
+{% endblock %}

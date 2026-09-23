@@ -1,0 +1,285 @@
+/* ==========================================================
+   Our own styles, added on top of Pico.css.
+   Pico styles plain HTML; this file only adds what Pico lacks.
+   var(--pico-...) values are Pico's colors and sizes, so our
+   additions match Pico and also work in its automatic dark mode.
+   ========================================================== */
+
+/* ---------- Header ---------- */
+
+/* Site name: normal text color, no underline. */
+.brand {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ---------- Status badges ---------- */
+
+/* A badge is a small rounded "pill" of color behind a word. */
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;          /* very large radius = fully rounded ends */
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #fff;
+  text-transform: capitalize;    /* "applied" displays as "Applied" */
+  white-space: nowrap;
+}
+
+/* One background color per status. Each is dark enough for white text
+   to be easy to read (accessibility contrast of at least 4.5 : 1). */
+.status-interested   { background-color: #475569; }  /* slate gray */
+.status-applied      { background-color: #1d4ed8; }  /* blue */
+.status-interviewing { background-color: #b45309; }  /* amber */
+.status-offer        { background-color: #15803d; }  /* green */
+.status-rejected     { background-color: #b91c1c; }  /* red */
+
+/* ---------- Summary counts ---------- */
+
+/* A grid that fits as many cards per row as there is room for.
+   auto-fit + minmax: each card is at least 6.5rem wide, and they
+   stretch to share leftover space. Phones get 3 per row. */
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr));
+  gap: 0.75rem;
+  margin-bottom: var(--pico-spacing);
+}
+
+/* Each card: number on top, label underneath, centered. */
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 0.5rem;
+  border: 1px solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
+  background-color: var(--pico-card-background-color);
+  color: inherit;
+  text-decoration: none;
+}
+
+.summary-card strong {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+/* Hovering, or being the current filter, outlines the card in Pico's main color. */
+.summary-card:hover {
+  border-color: var(--pico-primary);
+  text-decoration: none;
+}
+
+.summary-card.active {
+  border-color: var(--pico-primary);
+  box-shadow: inset 0 0 0 1px var(--pico-primary);  /* makes the border look 2px thick */
+}
+
+/* ---------- Filter bar ---------- */
+
+/* Stop the dropdown + button from stretching across a wide screen. */
+.filter-form {
+  max-width: 24rem;
+}
+
+/* ---------- Deadlines ---------- */
+
+/* Deadline within 7 days (and still "interested"): tint the whole row orange. */
+.row-due-soon td {
+  background-color: rgba(234, 88, 12, 0.1);
+}
+
+/* The small orange "Due soon" label next to the date. */
+.due-tag {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background-color: #c2410c;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Deadline already passed: faded gray so it doesn't grab attention. */
+.deadline-passed {
+  color: var(--pico-muted-color);
+}
+
+/* ---------- Table ---------- */
+
+/* Slightly smaller text and tighter cells than Pico's default,
+   so all 9 columns fit on a laptop screen. */
+.app-table {
+  font-size: 0.9rem;
+}
+
+.app-table th,
+.app-table td {
+  padding: 0.6rem 0.5rem;
+}
+
+/* Keep line breaks you typed in notes, and stop long notes making the column huge. */
+.cell-notes {
+  max-width: 14rem;
+  white-space: pre-line;
+}
+
+/* Keep Edit and Delete side by side. */
+.actions {
+  white-space: nowrap;
+}
+
+/* Pico gives forms and buttons space underneath; remove it inside the table. */
+.actions form {
+  display: inline;
+  margin: 0;
+}
+
+/* Smaller buttons in the table so they don't make rows tall.
+   width: auto undoes Pico making submit buttons full width. */
+.actions [role="button"],
+.actions button {
+  width: auto;
+  margin: 0;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.85rem;
+}
+
+/* Never split a date like 2026-10-13 across two lines. */
+.cell-date {
+  white-space: nowrap;
+}
+
+/* Hidden on screen, but still read aloud by screen readers. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- Add / Edit form ---------- */
+
+/* Red bar on the left of the error message box. */
+.error-box {
+  border-left: 4px solid var(--pico-del-color);
+}
+
+.error-box ul {
+  margin-bottom: 0;
+}
+
+/* Save and Cancel side by side, wrapping if the screen is too narrow. */
+.form-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* width: auto undoes Pico making the Save button full width. */
+.form-buttons > * {
+  width: auto;
+  margin: 0;
+}
+
+/* ---------- Phones (screens narrower than 768px) ---------- */
+
+/* Sort links are only needed on phones (see below), so hide them otherwise. */
+.mobile-sort {
+  display: none;
+}
+
+/* @media means "only apply these rules when the condition is true". */
+@media (max-width: 767px) {
+
+  /* Show the sort links, since the table headings are hidden on phones. */
+  .mobile-sort {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.4rem 0.9rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .mobile-sort .current {
+    font-weight: 700;
+  }
+
+  /* Turn the table into cards: hide the headings, and make every
+     table part a normal block so rows stack instead of sitting in columns. */
+  .app-table thead {
+    display: none;
+  }
+
+  .app-table,
+  .app-table tbody,
+  .app-table tr,
+  .app-table td {
+    display: block;
+  }
+
+  /* Each row becomes a card with a border and rounded corners. */
+  .app-table tr {
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--pico-muted-border-color);
+    border-radius: var(--pico-border-radius);
+    background-color: var(--pico-card-background-color);
+  }
+
+  /* Each cell becomes one "Label   value" line. */
+  .app-table td {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.2rem 0;
+    border: none;
+    background-color: transparent;
+  }
+
+  /* ::before adds the label text in front of each value, taken from the
+     cell's data-label attribute in index.html (e.g. "Deadline"). */
+  .app-table td::before {
+    content: attr(data-label);
+    flex: 0 0 5.5rem;              /* fixed-width label column */
+    color: var(--pico-muted-color);
+    font-size: 0.85rem;
+  }
+
+  /* Hide lines for empty fields (e.g. no location) to keep cards short. */
+  .app-table td:empty {
+    display: none;
+  }
+
+  /* Company is the card's title: bigger, and no "Company" label. */
+  .app-table .cell-company {
+    font-size: 1.15rem;
+  }
+
+  .app-table .cell-company::before,
+  .app-table .actions::before {
+    content: none;
+  }
+
+  .app-table .cell-notes {
+    max-width: none;
+  }
+
+  .app-table .actions {
+    gap: 0.5rem;
+    padding-top: 0.6rem;
+  }
+
+  /* Due-soon cards get a thick orange stripe down the left side instead of a tinted row. */
+  .app-table tr.row-due-soon {
+    border-left: 5px solid #c2410c;
+  }
+}

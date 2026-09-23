@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+{% if errors %}
+{# role="alert" makes screen readers announce the errors right away. #}
+<article class="error-box" role="alert">
+  <strong>Please fix the following:</strong>
+  <ul>
+    {% for error in errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+  </ul>
+</article>
+{% endif %}
+
+{# action="" means "send the form back to this same page's URL". #}
+<form method="post" action="">
+  {# Pico's .grid puts these side by side on wide screens and stacks them on phones. #}
+  <div class="grid">
+    <label>Company *
+      <input name="company" value="{{ form.company }}" required>
+    </label>
+    <label>Role *
+      <input name="role" value="{{ form.role }}" required>
+    </label>
+  </div>
+
+  <div class="grid">
+    <label>Location
+      <input name="location" value="{{ form.location }}" placeholder="e.g. Toronto, ON or Remote">
+    </label>
+    <label>Status *
+      <select name="status">
+        {% for status in statuses %}
+        <option value="{{ status }}" {% if status == form.status %}selected{% endif %}>{{ status }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+
+  <div class="grid">
+    <label>Date applied
+      <input type="date" name="date_applied" value="{{ form.date_applied }}">
+    </label>
+    <label>Deadline
+      <input type="date" name="deadline" value="{{ form.deadline }}">
+    </label>
+  </div>
+
+  <label>Job posting link
+    <input type="url" name="posting_url" value="{{ form.posting_url }}" placeholder="https://...">
+  </label>
+
+  <label>Notes
+    <textarea name="notes" rows="4">{{ form.notes }}</textarea>
+  </label>
+
+  <div class="form-buttons">
+    <button type="submit">Save</button>
+    <a href="{{ url_for('index') }}" role="button" class="secondary outline">Cancel</a>
+  </div>
+  <small>* required</small>
+</form>
+{% endblock %}

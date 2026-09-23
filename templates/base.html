@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  {# Tells phones to use their real screen width instead of zooming out. #}
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Co-op Tracker{% endblock %}</title>
+  {# Pico.css: styles plain HTML tags automatically. Version pinned so it can't change under us. #}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.1.1/css/pico.min.css">
+  {# Our own small additions (badges, summary, deadlines, phone cards). #}
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="container">
+    <nav>
+      <ul>
+        <li><a href="{{ url_for('index') }}" class="brand"><strong>Co-op Tracker</strong></a></li>
+      </ul>
+      <ul>
+        <li><a href="{{ url_for('index') }}">Applications</a></li>
+        <li><a href="{{ url_for('add') }}" role="button">+ Add</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    {# Each page fills in this block with its own content. #}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
